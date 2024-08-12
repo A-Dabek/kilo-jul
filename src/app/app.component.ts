@@ -1,5 +1,11 @@
-import { AsyncPipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { AsyncPipe, NgStyle } from '@angular/common';
+import {
+  Component,
+  ElementRef,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import {
   collection,
   collectionData,
@@ -26,29 +32,68 @@ type WaterItemId = WaterItem & Id;
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, AsyncPipe, ReactiveFormsModule],
+  imports: [RouterOutlet, AsyncPipe, ReactiveFormsModule, NgStyle],
   template: `
-    @if (waterItem$ | async; as waterItem) {
-    <h1>{{ timePassed$ | async }}</h1>
-    <button (click)="onReset(waterItem.id)">Reset</button>
-    <div class="slidecontainer">
-      <input
-        (change)="onLimitChange(waterItem.id)"
-        [formControl]="goalControl"
-        type="range"
-        min="1000"
-        max="5000"
-        step="100"
-      />
+    <div class="container text-center">
+      @if (waterItem$ | async; as waterItem) {
+      <div class="row">
+        <h1 class="col">{{ timePassed$ | async }}</h1>
+        <div class="col">
+          <button class="btn btn-dark " (click)="onReset(waterItem.id)">
+            <i class="fas fa-arrows-rotate"></i>
+            Reset
+          </button>
+        </div>
+      </div>
+
+      <div class="row">
+        <input
+          (change)="onLimitChange(waterItem.id)"
+          [formControl]="goalControl"
+          class="form-range"
+          type="range"
+          min="1000"
+          max="5000"
+          step="100"
+        />
+        <div>{{ waterItem.progress }}/{{ waterItem.goal }} ml</div>
+
+        <div class="position-relative">
+          <div class="position-relative" #originalElement>
+            <i
+              class="fa-solid fa-person-dress text-primary"
+              style="height: 500px;"
+            >
+            </i>
+          </div>
+          <div
+            class="position-absolute"
+            [ngStyle]="{ 'max-height': progressMaxHeight() + 'px' }"
+            style="overflow: hidden; left: 0; right: 0; margin: auto; top: 0"
+          >
+            <i class="fa-solid fa-person-dress" style="height: 500px;"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <button
+          class="col btn btn-dark"
+          (click)="onProgress(waterItem.id, waterItem.progress + 250)"
+        >
+          <i class="fas fa-glass-water"></i>
+          250 ml
+        </button>
+        <button
+          class="col btn btn-dark"
+          (click)="onProgress(waterItem.id, waterItem.progress + 1000)"
+        >
+          <i class="fas fa-bottle-water"></i>
+          1 l
+        </button>
+      </div>
+      }
     </div>
-    <div>{{ waterItem.progress }}/{{ waterItem.goal }}</div>
-    <button (click)="onProgress(waterItem.id, waterItem.progress + 250)">
-      250 ml
-    </button>
-    <button (click)="onProgress(waterItem.id, waterItem.progress + 1000)">
-      1 l
-    </button>
-    }
   `,
 })
 export class AppComponent {
@@ -60,7 +105,8 @@ export class AppComponent {
     }) as Observable<WaterItemId[]>
   ).pipe(
     map((items) => items[0]),
-    tap((item: WaterItemId) => this.goalControl.setValue(item.goal))
+    tap((item: WaterItemId) => this.goalControl.setValue(item.goal)),
+    tap((item) => this.calculateProgress(item.progress, item.goal))
   );
 
   readonly timePassed$ = this.waterItem$.pipe(
@@ -76,6 +122,10 @@ export class AppComponent {
 
   readonly goalControl = new FormControl(0);
 
+  readonly progressMaxHeight = signal(0);
+
+  readonly drunkElement = viewChild<ElementRef>('originalElement');
+
   onReset(id: string) {
     const timestamp = new Date().getTime();
     updateDoc(doc(this.waterCollection, id), { timestamp, progress: 0 });
@@ -84,6 +134,22 @@ export class AppComponent {
   onLimitChange(id: string) {
     const goal = this.goalControl.value;
     updateDoc(doc(this.waterCollection, id), { goal });
+  }
+
+  calculateProgress(progress: number, goal: number) {
+    if (progress >= goal) {
+      this.progressMaxHeight.set(0);
+      return;
+    }
+
+    const nativeElement = this.drunkElement()?.nativeElement as HTMLDivElement;
+    if (!nativeElement) return;
+
+    const percentProgress = 1.0 - progress / goal;
+    const desiredHeight = Math.floor(
+      percentProgress * nativeElement.offsetHeight
+    );
+    this.progressMaxHeight.set(desiredHeight);
   }
 
   onProgress(id: string, amount: number) {
