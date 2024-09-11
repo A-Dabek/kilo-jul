@@ -60,22 +60,19 @@ type WaterItemId = WaterItem & Id;
                   1l
                 </button>
               </div>
+              <span>{{ waterItem.progress }}/{{ waterItem.goal }} ml</span>
               <app-water-progress [progress]="waterItem.progress" [goal]="waterItem.goal"/>
-
             </div>
 
-            <div class="text-center">
-              <input
-                (change)="onLimitChange(waterItem.id)"
-                [formControl]="goalControl"
-                class="form-range"
-                type="range"
-                min="1000"
-                max="5000"
-                step="100"
-              />
-              <div>{{ waterItem.progress }}/{{ waterItem.goal }} ml</div>
-            </div>
+            <input
+              (change)="onLimitChange(waterItem.id)"
+              [formControl]="goalControl"
+              class="form-range"
+              type="range"
+              min="1000"
+              max="5000"
+              step="100"
+            />
           }
         </div>
       </div>
