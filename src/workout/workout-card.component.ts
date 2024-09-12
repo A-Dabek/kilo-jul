@@ -1,6 +1,7 @@
 import {AsyncPipe, NgStyle} from "@angular/common";
 import {ChangeDetectionStrategy, Component, inject} from "@angular/core";
 import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {tap} from "rxjs";
 import {StateService} from "../data-access/state.service";
 
 
@@ -20,7 +21,7 @@ import {StateService} from "../data-access/state.service";
         <div class="card-body">
           @if (state$ | async; as state) {
             <h1 class="card-title d-flex justify-content-between">
-              Jedzenie
+              Aktywność
             </h1>
             <h6 class="card-subtitle mb-2 text-muted">Zjedzone posiłki: {{ state.amount }}
               @if (state.name) {

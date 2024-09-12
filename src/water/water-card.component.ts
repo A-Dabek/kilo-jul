@@ -31,14 +31,14 @@ import {WaterProgressComponent} from "./water-progress.component";
               <div>
                 <button
                   class="btn btn-dark btn-sm me-2"
-                  (click)="onProgress(state.amount + 250)"
+                  (click)="onProgress(state.amount, 250)"
                 >
                   <i class="fas fa-glass-water"></i>
                   250ml
                 </button>
                 <button
                   class="btn btn-dark btn-sm"
-                  (click)="onProgress(state.amount + 1000)"
+                  (click)="onProgress(state.amount, 1000)"
                 >
                   <i class="fas fa-bottle-water"></i>
                   1l
@@ -75,7 +75,7 @@ export class WaterCardComponent {
     this.stateService.onWaterGoalChange(goal);
   }
 
-  onProgress(amount: number) {
-    this.stateService.onWaterProgress(amount);
+  onProgress(current: number, increment: number) {
+    this.stateService.onWaterProgress(current, increment);
   }
 }

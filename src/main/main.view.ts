@@ -1,5 +1,9 @@
-import {ChangeDetectionStrategy, Component} from "@angular/core";
+import {AsyncPipe, NgClass} from "@angular/common";
+import {ChangeDetectionStrategy, Component, inject} from "@angular/core";
+import {tap} from "rxjs";
+import {StateService} from "../data-access/state.service";
 import {FoodCardComponent} from "../food/food-card.component";
+import {HistoryComponent} from "../history.component";
 import {WaterCardComponent} from "../water/water-card.component";
 import {WorkoutCardComponent} from "../workout/workout-card.component";
 
@@ -10,17 +14,52 @@ import {WorkoutCardComponent} from "../workout/workout-card.component";
   imports: [
     FoodCardComponent,
     WaterCardComponent,
-    WorkoutCardComponent
+    WorkoutCardComponent,
+    HistoryComponent,
+    AsyncPipe,
+    NgClass
   ],
   template:
     `
-      <app-water-card/>
-      <app-food-card/>
-      <app-workout-card/>
+      <nav class="navbar navbar-expand navbar-light bg-light">
+        <div class="container-fluid">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <span class="nav-link" [ngClass]="{active: showCardsSection}" (click)="showCards()">Dzisiaj</span>
+            </li>
+            <li class="nav-item">
+              <span class="nav-link" [ngClass]="{active: !showCardsSection}" (click)="showHistory()">Historia</span>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      @if (showCardsSection) {
+        <app-water-card/>
+        <app-food-card/>
+        <app-workout-card/>
+      } @else {
+        <app-history title="Woda" [entries]="(waterHistory$ | async) || []"/>
+        <app-history title="Jedzenie" [entries]="(foodHistory$ | async) || []"/>
+        <app-history title="Aktywność" [entries]="(workoutHistory$ | async) || []"/>
+      }
     `,
   host: {
     class: 'd-flex flex-column gap-1'
   }
 }) export class MainComponent {
 
+  private stateService = inject(StateService);
+  readonly foodHistory$ = this.stateService.foodHistoryCollection$;
+  readonly workoutHistory$ = this.stateService.workoutHistoryCollection$;
+  readonly waterHistory$ = this.stateService.waterHistoryCollection$;
+
+  showCardsSection = true;
+
+  showCards() {
+    this.showCardsSection = true;
+  }
+
+  showHistory() {
+    this.showCardsSection = false;
+  }
 }
