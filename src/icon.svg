@@ -1,0 +1,40 @@
+<svg class="Icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="height: 512px; width: 512px;">
+  <defs>
+    <filter id="filter2">
+
+      <!-- Horizontal displacement effect -->
+      <feTurbulence type="turbulence" baseFrequency="0.01, 0.1" numOctaves="2" result="turbulence">
+        <animate attributeName="baseFrequency" values="0.01, 0.1;0.02, 0.2;0.01, 0.1" dur="0.5s"
+                 repeatCount="indefinite"/>
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="40" xChannelSelector="R" yChannelSelector="G">
+        <animate attributeName="scale" values="40;80;40" dur="0.5s" repeatCount="indefinite"/>
+      </feDisplacementMap>
+      <!-- Color separation effect -->
+      <feComponentTransfer result="colorShift">
+        <feFuncR type="discrete" tableValues="1 0 0">
+          <animate attributeName="tableValues" values="1 0 0;0 1 0;1 0 0" dur="0.5s" repeatCount="indefinite"/>
+        </feFuncR>
+        <feFuncG type="discrete" tableValues="0 1 0">
+          <animate attributeName="tableValues" values="0 1 0;1 0 0;0 1 0" dur="0.5s" repeatCount="indefinite"/>
+        </feFuncG>
+        <feFuncB type="discrete" tableValues="0 0 1">
+          <animate attributeName="tableValues" values="0 0 1;0 1 0;0 0 1" dur="0.5s" repeatCount="indefinite"/>
+        </feFuncB>
+      </feComponentTransfer>
+      <!-- Merge original and distorted images -->
+      <feMerge>
+        <feMergeNode in="colorShift"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+    <path d="M0 0h512v512H0z" fill="#000" fill-opacity="1"></path>
+    <g transform="translate(0,0)">
+      <g filter="url(#filter2)">
+      <path
+        d="m409.296 439.472-1.109 31.597c-18.425.373-33.223-6.696-39.349-31.525zm-306.592 0 1.109 31.597c18.425.373 33.223-6.696 39.349-31.525zm325.607-21.249H83.69l-3.902-25.05h352.426zM256 303.98c76.92 0 99.528 22.227 99.528 22.227l-4.786 45.443H161.258l-4.786-45.443S179.08 303.98 256 303.98zm118.19 67.67s11.777-82.262 15.23-109.121c7.474-58.138 96.66-36.047 89.912 11.16-4.33 30.29-39.08 25.984-39.08 25.984l-9.454 71.977zm-236.38 0s-11.777-82.262-15.23-109.121c-7.474-58.138-96.66-36.047-89.912 11.16 4.33 30.29 39.08 25.984 39.08 25.984l9.454 71.977zM256 40.917c88.106 0 185.768 20.55 174.504 169.052-30.952-4.267-59.122 3.8-62.996 31.9-1.49 10.811-7.78 57.679-7.78 57.679S322.777 282.119 256 282.119s-103.729 17.429-103.729 17.429-6.29-46.868-7.78-57.679c-3.873-28.1-32.043-36.167-62.995-31.9C70.232 61.467 167.894 40.917 256 40.917z"
+        fill="#fff" fill-opacity="1"></path>
+    </g>
+  </g>
+</svg>

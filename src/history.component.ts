@@ -60,7 +60,7 @@ export class HistoryComponent {
 
     entries.forEach(entry => {
       const entryDate = new Date(entry.timestamp);
-      const entryDayOfTheWeek = (entryDate.getDate() - 1) % 7;
+      const entryDayOfTheWeek = (entryDate.getDate()) % 7;
       const msInAWeek = 7 * 24 * 60 * 60 * 1000;
       const weeksAgo = Math.floor((now.getTime() - entryDate.getTime()) / msInAWeek);
       if (weeksAgo >= 4) return;

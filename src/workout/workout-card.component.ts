@@ -1,7 +1,6 @@
 import {AsyncPipe, NgStyle} from "@angular/common";
 import {ChangeDetectionStrategy, Component, inject} from "@angular/core";
 import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {tap} from "rxjs";
 import {StateService} from "../data-access/state.service";
 
 
@@ -23,13 +22,13 @@ import {StateService} from "../data-access/state.service";
             <h1 class="card-title d-flex justify-content-between">
               Aktywność
             </h1>
-            <h6 class="card-subtitle mb-2 text-muted">Zjedzone posiłki: {{ state.amount }}
+            <h6 class="card-subtitle mb-2 text-muted">Wykonane ćwiczenia: {{ state.amount }}
               @if (state.name) {
                 ostatni: {{ state.name }}
               }
             </h6>
             <form class="d-flex gap-1" (ngSubmit)="onSubmitWorkout(state.amount)">
-              <input type="email" class="form-control" placeholder="Posiłek" [formControl]="nameControl">
+              <input type="text" class="form-control" placeholder="Ćwiczenie" [formControl]="nameControl">
               <button type="submit" class="btn btn-primary">
                 <i class="bi-check"></i>
               </button>
@@ -51,4 +50,5 @@ export class WorkoutCardComponent {
     this.stateService.onWorkoutDone(name, currentAmount + 1);
     this.nameControl.reset();
   }
+
 }

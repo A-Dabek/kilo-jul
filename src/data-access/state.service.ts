@@ -1,7 +1,7 @@
 import {inject, Injectable} from "@angular/core";
-import {addDoc, collection, collectionData, doc, docData, Firestore, setDoc, updateDoc} from "@angular/fire/firestore";
-import {Observable} from "rxjs";
-import {FoodHistory, FoodState, HistoryEntry, WaterHistory, WaterState, WorkoutHistory, WorkoutState} from "./model";
+import {addDoc, collection, collectionData, doc, docData, Firestore, updateDoc} from "@angular/fire/firestore";
+import {map, Observable, take} from "rxjs";
+import {FoodState, HistoryEntry, WaterHistory, WaterState, WorkoutState} from "./model";
 
 @Injectable({providedIn: 'root'})
 export class StateService {
@@ -32,12 +32,29 @@ export class StateService {
     return new Date().getTime();
   }
 
+  resetWhnOutDated(resource: 'water' | 'food' | 'workout') {
+    docData(doc(this.collection, resource)).pipe(take(1)).subscribe((item: HistoryEntry) => {
+        const today = new Date();
+        const dateOfState = new Date();
+        dateOfState.setTime(item.timestamp);
+        if (today.getDate() !== dateOfState.getDate()) {
+          console.log('reset', resource, item);
+          this.reset(resource);
+        }
+      }
+    );
+  }
+
+  private reset(resource: 'water' | 'food' | 'workout') {
+    updateDoc(doc(this.collection, resource), {amount: 0, timestamp: this.timestamp});
+  }
+
   onWaterGoalChange(goal: number) {
     updateDoc(this.waterDoc, {goal});
   }
 
   onWaterProgress(current: number, increment: number) {
-    updateDoc(doc(this.collection, 'water'), {amount: current + increment});
+    updateDoc(doc(this.collection, 'water'), {amount: current + increment, timestamp: this.timestamp});
     addDoc(collection(this.collection, 'water', 'history'), {
       amount: increment,
       timestamp: this.timestamp,
@@ -53,12 +70,35 @@ export class StateService {
   }
 
   private logHistory(collectionName: string, name: string, amount: number) {
-    updateDoc(doc(this.collection, collectionName), {name, amount});
+    updateDoc(doc(this.collection, collectionName), {name, amount, timestamp: this.timestamp});
     addDoc(collection(this.collection, collectionName, 'history'), {
       amount: 1,
       name,
       timestamp: this.timestamp,
     });
+  }
+
+  private squashHistoryFromSameDayAndAddAmounts() {
+    this.waterHistoryCollection$.pipe(
+      map(history => {
+        const historyByDay = new Map<number, HistoryEntry[]>();
+        history.forEach(entry => {
+          const miliseconds = entry.timestamp;
+          const date = new Date(miliseconds).setHours(0, 0, 0, 0);
+          if (historyByDay.has(date)) {
+            historyByDay.get(date)?.push(entry);
+          } else {
+            historyByDay.set(date, [entry]);
+          }
+          return Array.from(historyByDay.values()).map(entries => {
+            const totalAmount = entries.reduce((sum, entry) => sum + entry.amount, 0);
+            return {
+              ...entries[0],
+              amount: totalAmount
+            };
+          });
+        })
+      }));
   }
 }
 

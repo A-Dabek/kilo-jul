@@ -1,7 +1,7 @@
 import {AsyncPipe, NgStyle} from "@angular/common";
-import {ChangeDetectionStrategy, Component, inject} from "@angular/core";
+import {ChangeDetectionStrategy, Component, inject, OnInit} from "@angular/core";
 import {FormControl, ReactiveFormsModule} from "@angular/forms";
-import {tap} from "rxjs";
+import {take, tap} from "rxjs";
 import {WaterState} from "../data-access/model";
 import {StateService} from "../data-access/state.service";
 import {WaterProgressComponent} from "./water-progress.component";

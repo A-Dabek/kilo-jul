@@ -1,5 +1,5 @@
 import {AsyncPipe, NgStyle} from "@angular/common";
-import {ChangeDetectionStrategy, Component, inject} from "@angular/core";
+import {ChangeDetectionStrategy, Component, inject, OnInit} from "@angular/core";
 import {FormControl, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {StateService} from "../data-access/state.service";
 import {WaterProgressComponent} from "../water/water-progress.component";
@@ -29,7 +29,7 @@ import {WaterProgressComponent} from "../water/water-progress.component";
               }
             </h6>
             <form class="d-flex gap-1" (ngSubmit)="onSubmitFood(state.amount)">
-              <input type="email" class="form-control" placeholder="Posiłek" [formControl]="nameControl">
+              <input type="text" class="form-control" placeholder="Posiłek" [formControl]="nameControl">
               <button type="submit" class="btn btn-primary">
                 <i class="bi-check"></i>
               </button>

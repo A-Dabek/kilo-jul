@@ -1,6 +1,5 @@
 import {AsyncPipe, NgClass} from "@angular/common";
-import {ChangeDetectionStrategy, Component, inject} from "@angular/core";
-import {tap} from "rxjs";
+import {ChangeDetectionStrategy, Component, inject, OnInit} from "@angular/core";
 import {StateService} from "../data-access/state.service";
 import {FoodCardComponent} from "../food/food-card.component";
 import {HistoryComponent} from "../history.component";
@@ -46,7 +45,8 @@ import {WorkoutCardComponent} from "../workout/workout-card.component";
   host: {
     class: 'd-flex flex-column gap-1'
   }
-}) export class MainComponent {
+})
+export class MainComponent implements OnInit {
 
   private stateService = inject(StateService);
   readonly foodHistory$ = this.stateService.foodHistoryCollection$;
@@ -54,6 +54,12 @@ import {WorkoutCardComponent} from "../workout/workout-card.component";
   readonly waterHistory$ = this.stateService.waterHistoryCollection$;
 
   showCardsSection = true;
+
+  ngOnInit() {
+    this.stateService.resetWhnOutDated('water');
+    this.stateService.resetWhnOutDated('workout');
+    this.stateService.resetWhnOutDated('food');
+  }
 
   showCards() {
     this.showCardsSection = true;
